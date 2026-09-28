@@ -1,9 +1,8 @@
 # Alsania.io Redirects
 
-# AED demo - serve files directly (must come before catch-all)
+# AED - serve index directly, static assets handled by Cloudflare Pages
 /aed  /aed/index.html 200
 /aed/ /aed/index.html 200
-/aed/* /aed/:splat 200
 
 # Store redirects
 /dashery https://mnemonic.dashery.com/ 302
