@@ -120,12 +120,8 @@ class GlassUI {
             });
         }
 
-        // Wallet connection
-        if (connectBtn) {
-            connectBtn.addEventListener('click', () => {
-                this.connectWallet();
-            });
-        }
+        // Wallet connection is owned by app.v4.js (it clones+rebinds #connectBtn),
+        // so GlassUI intentionally does NOT bind it here to avoid multiple handlers.
 
         // Wallet status indicator
         if (walletStatus) {
@@ -479,23 +475,26 @@ class GlassUI {
                 connectBtn.disabled = true;
             }
 
-            // Simulate connection (replace with actual Web3 connection)
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // Update UI to show connected state
+            // Delegate to the real Web3 provider
+            if (!window.ethereum) {
+                throw new Error('No Web3 provider detected. Please install MetaMask.');
+            }
+            if (!window.web3Provider) {
+                throw new Error('Web3 provider not initialized. Please refresh the page.');
+            }
+
+            const result = await window.web3Provider.connect();
+            if (result === false) {
+                throw new Error('Connection rejected');
+            }
+
+            // Success is reflected by wallet.js / app.js via the connected event;
+            // ensure the indicator reflects the connected state here too.
             if (statusIndicator) {
                 statusIndicator.classList.add('connected');
             }
-            
             if (connectBtn) {
-                connectBtn.innerHTML = '<i class="fas fa-check-circle"></i> Connected';
-                connectBtn.classList.add('connected');
-                
-                // Update wallet status
-                const walletAddress = document.getElementById('walletAddress');
-                if (walletAddress) {
-                    walletAddress.textContent = '0x1234...5678'; // Mock address
-                }
+                connectBtn.disabled = false;
             }
 
         } catch (error) {
@@ -512,12 +511,18 @@ class GlassUI {
     }
 
     showWalletModal() {
+        let address = 'Not connected';
+        if (window.web3Provider && window.web3Provider.getAddress) {
+            const addr = window.web3Provider.getAddress();
+            if (addr) address = addr.slice(0, 6) + '...' + addr.slice(-4);
+        }
+        const connected = window.web3Provider && window.web3Provider.isConnected && window.web3Provider.isConnected();
         const content = `
             <div class="wallet-modal-content">
                 <h4>Wallet Information</h4>
                 <div class="wallet-details">
-                    <p><strong>Address:</strong> 0x1234...5678</p>
-                    <p><strong>Balance:</strong> 1.234 MATIC</p>
+                    <p><strong>Address:</strong> ${address}</p>
+                    <p><strong>Status:</strong> ${connected ? 'Connected' : 'Disconnected'}</p>
                     <p><strong>Network:</strong> Polygon Amoy</p>
                 </div>
                 <div class="wallet-actions">
