@@ -14,14 +14,16 @@
   Access-Control-Allow-Origin: *
 
 # JavaScript files - allow loading, set correct MIME type
+# Short TTL + revalidate: filenames are not content-hashed, so `immutable`
+# would pin stale code at the edge for a year and defeat ?v= cache-busting.
 /*.js
   Content-Type: application/javascript
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=300, must-revalidate
 
 # CSS files
 /*.css
   Content-Type: text/css
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=300, must-revalidate
 
 # HTML files - no cache
 /*.html
