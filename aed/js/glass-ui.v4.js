@@ -322,8 +322,13 @@ class GlassUI {
         if (domainNameInput) {
             domainNameInput.addEventListener('input', (e) => {
                 this.validateDomainName(e.target.value);
+                this.updateCostBreakdown();
             });
         }
+
+        // TLD selection (radios are rendered dynamically into #tldGrid)
+        this.renderTldOptions();
+        document.getElementById('tldGrid')?.addEventListener('change', () => this.updateCostBreakdown());
 
         // Real-time search validation
         const heroSearchInput = document.getElementById('heroSearchInput');
@@ -417,9 +422,84 @@ class GlassUI {
         `;
     }
 
+    /**
+     * Pricing mirrors the on-chain AEDMinimalV2 config (USDC, 6 decimals).
+     * $1.00 = 1_000_000 micro-units. Update here if contract config changes.
+     */
+    static get PRICING() {
+        return {
+            freeTlds: ['aed', 'alsa', '07'],
+            tldUsd: { aed: 0, alsa: 0, '07': 0, alsania: 1, fx: 1, echo: 1 },
+            subdomainUsd: 2.0,
+            metadataUsd: 0.5
+        };
+    }
+
+    formatUsd(amount) {
+        return '$' + Number(amount).toFixed(2) + ' USDC';
+    }
+
+    renderTldOptions() {
+        const grid = document.getElementById('tldGrid');
+        if (!grid || grid.dataset.rendered === 'true') return;
+        const p = GlassUI.PRICING;
+        const order = ['aed', 'alsa', '07', 'alsania', 'fx', 'echo'];
+        grid.innerHTML = order.map((tld, i) => {
+            const price = p.tldUsd[tld] ?? 0;
+            const priceLabel = price === 0 ? 'FREE' : this.formatUsd(price);
+            return `<label class="tld-option">
+                <input type="radio" name="tld" value="${tld}"${i === 0 ? ' checked' : ''}>
+                <div class="tld-card">
+                    <span class="tld-name">.${tld}</span>
+                    <span class="tld-price">${priceLabel}</span>
+                </div>
+            </label>`;
+        }).join('');
+        grid.dataset.rendered = 'true';
+        this.updateCostBreakdown();
+    }
+
     updateCostBreakdown() {
-        // Implementation for dynamic cost calculation
-        console.log('Updating cost breakdown...');
+        const p = GlassUI.PRICING;
+
+        const selectedTld = document.querySelector('input[name="tld"]:checked')?.value;
+        const subdomainEl = document.getElementById('subdomainFeature');
+        const metadataEl = document.getElementById('metadataFeature');
+
+        let base = selectedTld ? (p.tldUsd[selectedTld] ?? 0) : 0;
+        let total = base;
+
+        const baseEl = document.getElementById('baseCost');
+        if (baseEl) baseEl.textContent = this.formatUsd(base);
+
+        // rebuild breakdown item lines
+        const breakdown = document.getElementById('costBreakdown');
+        if (breakdown) {
+            let html = `<div class="breakdown-item"><span>Domain Registration</span><span>${this.formatUsd(base)}</span></div>`;
+            if (subdomainEl && subdomainEl.checked) {
+                total += p.subdomainUsd;
+                html += `<div class="breakdown-item"><span>Subdomain Support</span><span>${this.formatUsd(p.subdomainUsd)}</span></div>`;
+            }
+            if (metadataEl && metadataEl.checked) {
+                total += p.metadataUsd;
+                html += `<div class="breakdown-item"><span>Enhanced Metadata</span><span>${this.formatUsd(p.metadataUsd)}</span></div>`;
+            }
+            breakdown.innerHTML = html;
+        }
+
+        const totalEl = document.getElementById('totalCost');
+        if (totalEl) totalEl.textContent = this.formatUsd(total);
+
+        // enable/disable register button
+        const registerBtn = document.getElementById('registerDomainBtn');
+        const nameInput = document.getElementById('domainNameInput');
+        if (registerBtn) {
+            const hasName = !!nameInput && nameInput.value.trim().length >= 1;
+            const hasTld = !!selectedTld;
+            registerBtn.disabled = !(hasName && hasTld);
+        }
+
+        console.log('💰 Cost:', this.formatUsd(total), '(base', this.formatUsd(base) + ')');
     }
 
     /**

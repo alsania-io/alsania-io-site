@@ -517,7 +517,7 @@ class GlassUI {
                 <h4>Wallet Information</h4>
                 <div class="wallet-details">
                     <p><strong>Address:</strong> 0x1234...5678</p>
-                    <p><strong>Balance:</strong> 1.234 MATIC</p>
+                    <p><strong>Balance:</strong> see wallet</p>
                     <p><strong>Network:</strong> Polygon Amoy</p>
                 </div>
                 <div class="wallet-actions">
