@@ -1,4 +1,4 @@
-name: Build and Prep for Cloudflare Pages
+name: Build and Deploy to Cloudflare Pages
 
 on:
   push:
@@ -10,10 +10,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+
       - name: Install dependencies
         run: npm install
-      - name: Build
+
+      - name: Build (produces dist/)
         run: npm run build
+
+      - name: Verify dist output
+        run: |
+          test -d dist || { echo "::error::dist/ was not produced by the build"; exit 1; }
+          test -f dist/index.html || { echo "::error::dist/index.html missing"; exit 1; }
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=alsania-io-site --branch=main
