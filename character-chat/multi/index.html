@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi Character Chat | Alsania</title>
+  <meta name="description" content="Multi-character AI chat experience. Adults only." />
+  <link rel="stylesheet" href="../../assets/css/styles.css" />
+  <link rel="stylesheet" href="../../assets/css/components.css" />
+  <link rel="stylesheet" href="../character-chat.css" />
+</head>
+<body class="cc-page">
+  <div id="header-container"></div>
+
+  <div id="age-gate-root"></div>
+
+  <main class="cc-shell">
+    <div class="cc-frame-wrap" id="frame-wrap" hidden>
+      <iframe id="chat-frame" title="Multi Character Chat" allow="clipboard-write"></iframe>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+
+  <script src="../age-gate.js"></script>
+  <script src="/loadComponents.js"></script>
+  <script>
+    (function () {
+      var SRC = 'https://null.perchance.org/dreamai-multi';
+      var gateRoot = document.getElementById('age-gate-root');
+      var wrap = document.getElementById('frame-wrap');
+      var frame = document.getElementById('chat-frame');
+      function start() {
+        frame.src = SRC;
+        wrap.hidden = false;
+        gateRoot.innerHTML = '';
+      }
+      window.AlsaniaAgeGate.renderGate(gateRoot, start);
+    })();
+  </script>
+</body>
+</html>
