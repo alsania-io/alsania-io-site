@@ -20,6 +20,7 @@ const INLINE_COMPONENTS = {
           <a href="#" class="nav-link dropdown-toggle">Products <span class="arrow">▾</span></a>
           <ul class="dropdown-menu">
             <li><a href="/tools/nyx/">Nyx Extension</a></li>
+            <li><a href="/tools/nyx-mobile/">Nyx Mobile</a></li>
             <li><a href="/tools/devconx/">DevConX (VSCode)</a></li>
             <li><a href="https://github.com/alsania-io/scrypgen" target="_blank">ScrypGen</a></li>
             <li><a href="/tools/nyx-unified/">Nyx Unified</a></li>
@@ -34,6 +35,7 @@ const INLINE_COMPONENTS = {
             <li><a href="/hilo/">Hi-Lo Game</a></li>
             <li><a href="/crash/">Crash</a></li>
             <li><a href="/dreamai/">DreamAI Mint</a></li>
+            <li><a href="/character-chat/">Character Chats</a></li>
             <li><a href="/aed/">AED</a></li>
           </ul>
         </li>
@@ -79,6 +81,8 @@ const INLINE_COMPONENTS = {
         <h3>Live Projects</h3>
         <ul>
           <li><a href="/tools/nyx/">Nyx Extension</a></li>
+          <li><a href="/tools/nyx-mobile/">Nyx Mobile</a></li>
+          <li><a href="/character-chat/">Character Chats</a></li>
           <li><a href="/shop/">Official Merch</a></li>
           <li><a href="/story">Book of Alsania</a></li>
           <li><a href="/claim">Faucet</a></li>
