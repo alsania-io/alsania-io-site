@@ -72,8 +72,8 @@
 
         <div class="nyx-badges">
           <img
-            src="https://img.shields.io/badge/Version-4.0.2-brightgreen"
-            alt="Version 4.0.2"
+            src="https://img.shields.io/badge/Version-4.0.4-brightgreen"
+            alt="Version 4.0.4"
           />
           <img
             src="https://img.shields.io/badge/License-MIT-blue"
@@ -265,8 +265,8 @@
               opacity: 0.8;
             "
           >
-            Each package includes: Extension files, configuration, setup guide, and
-            license. No coding knowledge required.
+            Each package includes: the Nyx Control v4.0.4 extension, MCP server
+            configuration, setup guide, and license. No coding knowledge required.
           </p>
         </div>
 
@@ -336,6 +336,18 @@
       document.addEventListener("DOMContentLoaded", function () {
         const mainDownloadBtn = document.getElementById("nyx-download-btn");
 
+        if (mainDownloadBtn) {
+          mainDownloadBtn.addEventListener('click', function () {
+            const basePath = window.location.hostname === 'alsania-io.github.io' ? '/alsania-io-site' : '';
+            const link = document.createElement('a');
+            link.href = basePath + '/tools/nyx/downloads/nyx-control-v4.0.4.zip';
+            link.download = 'nyx-control-v4.0.4.zip';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          });
+        }
+
         // Platform download buttons
         document.querySelectorAll('.platform-download-btn').forEach(btn => {
           btn.addEventListener('click', function() {
@@ -349,12 +361,12 @@
             };
             const basePath = getBasePath();
             const zipFiles = {
-              windows: basePath + '/tools/nyx/downloads/Nyx-Control-v4.0.2.zip',
-              macos: basePath + '/tools/nyx/downloads/Nyx-Control-v4.0.2.zip',
-              linux: basePath + '/tools/nyx/downloads/Nyx-Control-v4.0.2.zip',
-              chrome: basePath + '/tools/nyx/downloads/Nyx-Control-v4.0.2.crx',
-              firefox: 'https://addons.mozilla.org/en-US/firefox/addon/nyx-control/',
-              source: basePath + '/tools/nyx/downloads/Nyx-Control-v4.0.2.zip'
+              windows: basePath + '/tools/nyx/downloads/win-nyx-v4.0.4.zip',
+              macos: basePath + '/tools/nyx/downloads/mac-nyx-v4.0.4.zip',
+              linux: basePath + '/tools/nyx/downloads/linux-nyx-v4.0.4.zip',
+              chrome: basePath + '/tools/nyx/downloads/nyx-control-v4.0.4.crx',
+              firefox: 'https://addons.mozilla.org/en-US/firefox/addon/nyx-aegis/',
+              source: basePath + '/tools/nyx/downloads/nyx-control-v4.0.4.zip'
             };
             
             if (zipFiles[platform]) {
