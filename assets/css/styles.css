@@ -593,26 +593,6 @@ a:hover {
     padding: 60px 0;
   }
 
-  .alsania-nav ul {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background-color: var(--bg-secondary);
-    flex-direction: column;
-    padding: 1rem;
-    border-top: 1px solid var(--border-color);
-  }
-
-  .alsania-nav.active ul {
-    display: flex;
-  }
-
-  .mobile-menu {
-    display: flex;
-  }
-
   .hero-actions {
     flex-direction: column;
     align-items: center;

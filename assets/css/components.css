@@ -1,139 +1,119 @@
-/* Mobile menu button - hidden by default on desktop */
+/* ===== Header / navigation (single source of truth for nav layout) ===== */
+.alsania-header .nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  gap: 12px;
+}
+.alsania-header .header-right { flex-shrink: 0; }
+.alsania-nav ul { list-style: none; margin: 0; padding: 0; }
+
+/* Hamburger: hidden on desktop, shown at the mobile breakpoint */
 .mobile-menu {
   display: none;
-  background: transparent;
-  border: 2px solid rgba(102, 126, 234, 0.3);
-  border-radius: 8px;
-  padding: 8px 12px;
-  cursor: pointer;
   flex-direction: column;
   justify-content: space-between;
-  width: 40px;
-  height: 32px;
-  align-items: center;
-  z-index: 1001;
+  align-items: stretch;
+  box-sizing: border-box;
+  width: 42px;
+  height: 36px;
+  margin-left: 12px;
+  padding: 8px 9px;
+  background: transparent;
+  border: 2px solid var(--border-color, rgba(102, 126, 234, 0.3));
+  border-radius: 8px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 .mobile-menu span {
   display: block;
-  width: 24px;
+  width: 100%;
   height: 3px;
-  background: #e0e0e0;
+  background: var(--text-primary, #e0e0e0);
   border-radius: 3px;
-  transition: all 0.3s ease;
+  transition: transform 0.25s ease, opacity 0.2s ease;
 }
+.mobile-menu.active { border-color: var(--accent-primary, #667eea); }
+.mobile-menu.active span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.mobile-menu.active span:nth-child(2) { opacity: 0; }
+.mobile-menu.active span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
 
-/* Show mobile menu on small screens */
-@media (max-width: 768px) {
-  .mobile-menu {
-    display: flex !important;
-  }
-  .alsania-nav {
-    display: none !important;
-  }
-  .alsania-nav.active {
-    display: flex !important;
-    flex-direction: column;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: #1a1a2e;
-    padding: 20px;
-    z-index: 1000;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-  }
-  .alsania-nav.active ul {
-    flex-direction: column;
-    gap: 10px;
-  }
-  .alsania-nav.active ul li {
-    width: 100%;
-  }
-  .alsania-nav.active ul li a {
-    display: block;
-    padding: 10px 15px;
-    color: #e0e0e0;
-    text-decoration: none;
-  }
-  .alsania-nav.active ul li a:hover {
-    background: rgba(102, 126, 234, 0.1);
-  }
-  .mobile-menu.active {
-    border-color: #667eea;
-  }
-}
-
-/* Dropdown styles */
-.alsania-nav .dropdown {
-  position: relative;
-}
+/* Desktop dropdowns */
+.alsania-nav .dropdown { position: relative; }
 .alsania-nav .dropdown .dropdown-menu {
   display: none;
   position: absolute;
   top: 100%;
   left: 0;
   min-width: 200px;
-  background: #1a1a2e;
-  border-radius: 8px;
   padding: 8px 0;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  background: var(--bg-secondary, #1a1f2e);
+  border: 1px solid var(--border-color, #2a3147);
+  border-radius: 8px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   z-index: 1000;
 }
 .alsania-nav .dropdown:hover .dropdown-menu,
-.alsania-nav .dropdown .dropdown-menu.open {
-  display: block;
-}
-.alsania-nav .dropdown .dropdown-menu li {
-  display: block;
-}
+.alsania-nav .dropdown .dropdown-menu.open { display: block; }
+.alsania-nav .dropdown .dropdown-menu li { display: block; }
 .alsania-nav .dropdown .dropdown-menu li a {
   display: block;
   padding: 8px 20px;
-  color: #e0e0e0;
+  color: var(--text-primary, #e0e0e0);
   text-decoration: none;
 }
-.alsania-nav .dropdown .dropdown-menu li a:hover {
-  background: rgba(102, 126, 234, 0.1);
+.alsania-nav .dropdown .dropdown-menu li a:hover { background: rgba(102, 126, 234, 0.12); }
+.arrow { display: inline-block; transition: transform 0.25s ease; }
+.dropdown-toggle[aria-expanded="true"] .arrow { transform: rotate(180deg); }
+
+/* Touch devices: :hover sticks after a tap, so only the .open class may reveal a dropdown */
+@media (hover: none) {
+  .alsania-nav .dropdown:hover .dropdown-menu:not(.open) { display: none; }
 }
 
-/* Mobile dropdown fix - make dropdowns clickable and toggleable */
-@media (max-width: 768px) {
+/* Mobile layout (keep MOBILE_MAX in loadComponents.js in sync) */
+@media (max-width: 960px) {
+  .mobile-menu { display: flex; }
+
+  .alsania-nav { display: none; }
+  .alsania-nav.active {
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    padding: 12px 20px 20px;
+    background: var(--bg-secondary, #1a1f2e);
+    border-top: 1px solid var(--border-color, #2a3147);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    z-index: 1000;
+    /* long menus must scroll instead of running off the screen */
+    max-height: calc(100vh - 80px);
+    max-height: calc(100dvh - 80px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  .alsania-nav ul { flex-direction: column; gap: 2px; }
+  .alsania-nav ul li { width: 100%; }
+  .alsania-nav .nav-link { display: block; padding: 12px 8px; }
+  .alsania-nav .nav-link::after { display: none; }
   .alsania-nav .dropdown-toggle {
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    cursor: pointer;
   }
 
   .alsania-nav .dropdown .dropdown-menu {
     position: static;
+    min-width: 0;
+    margin: 2px 0 8px 12px;
+    padding: 4px 0;
+    background: var(--bg-tertiary, rgba(255, 255, 255, 0.05));
+    border: 0;
     box-shadow: none;
-    background: rgba(255,255,255,0.05);
-    margin-left: 10px;
-    margin-top: 5px;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-    padding: 0;
   }
-  
-  .alsania-nav .dropdown .dropdown-menu.open {
-    display: block;
-    max-height: 500px;
-    padding: 8px 0;
-  }
-
-  .alsania-nav .dropdown .dropdown-menu li a {
-    padding: 10px 20px;
-  }
-
-  .arrow {
-    transition: transform 0.3s ease;
-    display: inline-block;
-    margin-left: 8px;
-  }
-
-  .alsania-nav .dropdown:has(.dropdown-menu.open) .arrow {
-    transform: rotate(180deg);
-  }
+  .alsania-nav .dropdown:hover .dropdown-menu:not(.open) { display: none; }
+  .alsania-nav .dropdown .dropdown-menu li a { padding: 12px 16px; }
 }

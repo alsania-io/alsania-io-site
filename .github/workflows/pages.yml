@@ -5,18 +5,41 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-pages-deploy
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Check Cloudflare secrets
+        run: |
+          fail=0
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::error::Repo secret CLOUDFLARE_API_TOKEN is missing (Settings > Secrets and variables > Actions)"; fail=1
+          fi
+          if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error::Repo secret CLOUDFLARE_ACCOUNT_ID is missing (Settings > Secrets and variables > Actions)"; fail=1
+          fi
+          exit $fail
 
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+          cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build (produces dist/)
         run: npm run build
@@ -25,10 +48,11 @@ jobs:
         run: |
           test -d dist || { echo "::error::dist/ was not produced by the build"; exit 1; }
           test -f dist/index.html || { echo "::error::dist/index.html missing"; exit 1; }
+          test ! -e dist/.env || { echo "::error::dist/.env must not be deployed"; exit 1; }
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=alsania-io-site --branch=main
+          command: pages deploy dist --project-name=alsania-io-site --branch=main --commit-dirty=true

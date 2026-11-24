@@ -1,242 +1,128 @@
-// loadComponents.js - Runs immediately
-const DEBUG = true;
-function log(...args) { if (DEBUG) console.log("[Components]", ...args); }
-function error(...args) { console.error("[Components]", ...args); }
-function getComponentsBasePath() { return window.location.origin + "/components"; }
+// loadComponents.js
+// Loads header/footer/theme toggle and wires the navigation.
+// Safe to include once per page; every handler is bound exactly once.
+(function () {
+  "use strict";
+  if (window.__alsaniaComponents) return;
+  window.__alsaniaComponents = true;
 
-// Inline components for fallback
-const INLINE_COMPONENTS = {
-  "header": `<header class="alsania-header">
-  <div class="nav-container">
-    <a href="/" class="alsania-logo">
-      <div class="logo-container">
-        <span class="logo-text">ALSANIA</span>
-      </div>
-    </a>
-    <nav class="alsania-nav">
-      <ul>
-        <li><a href="/" class="nav-link">Home</a></li>
-        <li class="dropdown">
-          <a href="#" class="nav-link dropdown-toggle">Products <span class="arrow">▾</span></a>
-          <ul class="dropdown-menu">
-            <li><a href="/tools/nyx/">Nyx Extension</a></li>
-            <li><a href="/tools/nyx-mobile/">Nyx Mobile</a></li>
-            <li><a href="/tools/devconx/">DevConX (VSCode)</a></li>
-            <li><a href="https://github.com/alsania-io/scrypgen" target="_blank">ScrypGen</a></li>
-            <li><a href="/tools/nyx-unified/">Nyx Unified</a></li>
-          </ul>
-        </li>
-        <li class="dropdown">
-          <a href="#" class="nav-link dropdown-toggle">Ecosystem <span class="arrow">▾</span></a>
-          <ul class="dropdown-menu">
-            <li><a href="/rep/">Agent Registry</a></li>
-            <li><a href="/rating/">Rate Agents</a></li>
-            <li><a href="/claim/">Alsa Faucet</a></li>
-            <li><a href="/hilo/">Hi-Lo Game</a></li>
-            <li><a href="/crash/">Crash</a></li>
-            <li><a href="/dreamai/">DreamAI Mint</a></li>
-            <li><a href="/character-chat/">Character Chats</a></li>
-            <li><a href="/aed/">AED</a></li>
-          </ul>
-        </li>
-        <li class="dropdown">
-          <a href="#" class="nav-link dropdown-toggle">Community <span class="arrow">▾</span></a>
-          <ul class="dropdown-menu">
-            <li><a href="/about/">About</a></li>
-            <li><a href="/story/">Book of Alsania</a></li>
-            <li><a href="/blog/">Blog</a></li>
-            <li><a href="/contribute/">Contribute</a></li>
-            <li><a href="/donate/">Donate</a></li>
-          </ul>
-        </li>
-        <li><a href="/shop/" class="nav-link">Merch</a></li>
-        <li><a href="/services/" class="nav-link">Services</a></li>
-        <li><a href="/contact/" class="nav-link">Contact</a></li>
-      </ul>
-    </nav>
-    <div class="header-right">
-      <div id="theme-toggle-container"></div>
-      <button class="mobile-menu" aria-label="Menu" style="display:flex;flex-direction:column;justify-content:space-between;width:30px;height:24px;background:transparent;border:none;cursor:pointer;padding:0;margin-left:12px;">
-        <span style="display:block;height:3px;width:100%;background-color:#e0e0e0;border-radius:3px;transition:all 0.3s ease;"></span>
-        <span style="display:block;height:3px;width:100%;background-color:#e0e0e0;border-radius:3px;transition:all 0.3s ease;"></span>
-        <span style="display:block;height:3px;width:100%;background-color:#e0e0e0;border-radius:3px;transition:all 0.3s ease;"></span>
-      </button>
-    </div>
-  </div>
-</header>`,
-  "footer": `<footer class="footer">
-  <div class="footer-container">
-    <div class="footer-grid">
-      <div class="footer-section">
-        <h3>Alsania I/O</h3>
-        <p>Sovereign technology ecosystem. Built for creators, owned by no one, open to everyone.</p>
-        <div class="social-links">
-          <a href="https://github.com/alsania-io" target="_blank" rel="noopener"><img src="/assets/img/web-icons/github-icon.svg" alt="GitHub" style="width:28px;height:28px;" /></a>
-          <a href="https://x.com/sigmasauer07" target="_blank" rel="noopener"><img src="/assets/img/web-icons/x-icon.svg" alt="X" style="width:28px;height:28px;" /></a>
-          <a href="https://t.me/Alsania_io" target="_blank" rel="noopener"><img src="/assets/img/web-icons/telegram-icon.svg" alt="Telegram" style="width:28px;height:28px;" /></a>
-          <a href="https://discord.gg/SaCTgSHqdv" target="_blank" rel="noopener"><img src="/assets/img/web-icons/discord-icon.svg" alt="Discord" style="width:28px;height:28px;" /></a>
-        </div>
-      </div>
-      <div class="footer-section">
-        <h3>Live Projects</h3>
-        <ul>
-          <li><a href="/tools/nyx/">Nyx Extension</a></li>
-          <li><a href="/tools/nyx-mobile/">Nyx Mobile</a></li>
-          <li><a href="/character-chat/">Character Chats</a></li>
-          <li><a href="/shop/">Official Merch</a></li>
-          <li><a href="/story">Book of Alsania</a></li>
-          <li><a href="/claim">Faucet</a></li>
-          <li><a href="/hilo/">Hi-Lo Game</a></li>
-        </ul>
-      </div>
-      <div class="footer-section">
-        <h3>Coming Soon</h3>
-        <ul>
-          <li><a href="/tools/devconx/">DevConX (VSCode)</a></li>
-          <li><a href="/tools/scrypgen/">ScrypGen</a></li>
-          <li><a href="/tools/nyx-unified/">Nyx Unified</a></li>
-          <li><a href="/services/">Services</a></li>
-          <li><a href="/aed/">AED</a></li>
-        </ul>
-      </div>
-      <div class="footer-section">
-        <h3>Legal</h3>
-        <ul>
-          <li><a href="/legal/privacy-policy.html">Privacy Policy</a></li>
-          <li><a href="/legal/cookie-policy.html">Cookie Policy</a></li>
-          <li><a href="/legal/terms.html">Terms of Service</a></li>
-          <li><a href="/legal/disclaimer.html">Disclaimer</a></li>
-          <li><a href="/legal/refund-policy.html">Refund Policy</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>© 2026 Alsania I/O. All rights reserved. Built with purpose.</p>
-    </div>
-  </div>
-</footer>`
+  var MOBILE_MAX = 960; // keep in sync with assets/css/components.css
+  var THEME_KEY = "alsania-theme";
+
+  // Fallback copies of components/header.html and components/footer.html
+  // (used when /components/* cannot be fetched, e.g. file:// previews).
+  var INLINE_COMPONENTS = {
+  "header": "<header class=\"alsania-header\">\n  <div class=\"nav-container\">\n    <a href=\"/\" class=\"alsania-logo\">\n      <div class=\"logo-container\">\n        <span class=\"logo-text\">ALSANIA I/O</span>\n      </div>\n    </a>\n    <nav class=\"alsania-nav\">\n      <ul>\n        <li><a href=\"/\" class=\"nav-link\">Home</a></li>\n        <li class=\"dropdown\">\n          <a href=\"#\" class=\"nav-link dropdown-toggle\">Products <span class=\"arrow\">▾</span></a>\n          <ul class=\"dropdown-menu\">\n            <li><a href=\"/tools/nyx/\">Nyx Extension</a></li>\n            <li><a href=\"/tools/nyx-mobile/\">Nyx Mobile</a></li>\n            <li><a href=\"/tools/devconx/\">DevConX (VSCode)</a></li>\n            <li><a href=\"/tools/scrypgen/\">ScrypGen</a></li>\n            <li><a href=\"/tools/nyx-unified/\">Nyx Unified</a></li>\n          </ul>\n        </li>\n        <li class=\"dropdown\">\n          <a href=\"#\" class=\"nav-link dropdown-toggle\">Ecosystem <span class=\"arrow\">▾</span></a>\n          <ul class=\"dropdown-menu\">\n            <li><a href=\"/rep/\">Agent Registry</a></li>\n            <li><a href=\"/rating/\">Rate Agents</a></li>\n            <li><a href=\"/claim/\">Alsa Faucet</a></li>\n            <li><a href=\"/hilo/\">Hi-Lo Game</a></li>\n            <li><a href=\"/crash/\">Crash</a></li>\n            <li><a href=\"/dreamai/\">DreamAI Mint</a></li>\n            <li><a href=\"/character-chat/\">Character Chats</a></li>\n            <li><a href=\"/aed/\">AED</a></li>\n          </ul>\n        </li>\n        <li class=\"dropdown\">\n          <a href=\"#\" class=\"nav-link dropdown-toggle\">Community <span class=\"arrow\">▾</span></a>\n          <ul class=\"dropdown-menu\">\n            <li><a href=\"/about/\">About</a></li>\n            <li><a href=\"/story/\">Book of Alsania</a></li>\n            <li><a href=\"/blog/\">Blog</a></li>\n            <li><a href=\"/contribute/\">Contribute</a></li>\n            <li><a href=\"/donate/\">Donate</a></li>\n          </ul>\n        </li>\n        <li><a href=\"/shop/\" class=\"nav-link\">Merch</a></li>\n        <li><a href=\"/services/\" class=\"nav-link\">Services</a></li>\n        <li><a href=\"/contact/\" class=\"nav-link\">Contact</a></li>\n      </ul>\n    </nav>\n    <div class=\"header-right\">\n      <div id=\"theme-toggle-container\"></div>\n      <button class=\"mobile-menu\" type=\"button\" aria-label=\"Menu\" aria-expanded=\"false\"><span></span><span></span><span></span></button>\n    </div>\n  </div>\n</header>",
+  "footer": "<footer class=\"footer\">\n  <div class=\"footer-container\">\n    <div class=\"footer-grid\">\n      <div class=\"footer-section\">\n        <h3>Alsania I/O</h3>\n        <p>\n          Sovereign technology ecosystem. Built for creators, owned by no one,\n          open to everyone.\n        </p>\n        <div class=\"social-links\">\n          <a href=\"https://github.com/alsania-io\" title=\"GitHub\" target=\"_blank\" rel=\"noopener\"><img\n              src=\"/assets/img/web-icons/github-icon.svg\" alt=\"GitHub\" /></a>\n          <a href=\"https://x.com/sigmasauer07\" title=\"X\" target=\"_blank\" rel=\"noopener\"><img\n              src=\"/assets/img/web-icons/x-icon.svg\" alt=\"X\" /></a>\n          <a href=\"https://t.me/Alsania_io\" title=\"Telegram\" target=\"_blank\" rel=\"noopener\"><img\n              src=\"/assets/img/web-icons/telegram-icon.svg\" alt=\"Telegram\" /></a>\n          <a href=\"https://discord.gg/SaCTgSHqdv\" title=\"Discord\" target=\"_blank\" rel=\"noopener\"><img\n              src=\"/assets/img/web-icons/discord-icon.svg\" alt=\"Discord\" /></a>\n        </div>\n      </div>\n      <div class=\"footer-section\">\n        <h3>Live Projects</h3>\n        <ul>\n          <li><a href=\"/tools/nyx/\">Nyx Extension</a></li>\n          <li><a href=\"/tools/nyx-mobile/\">Nyx Mobile</a></li>\n          <li><a href=\"/character-chat/\">Character Chats</a></li>\n          <li><a href=\"/shop/\">Official Merch</a></li>\n          <li><a href=\"/story\">Book of Alsania</a></li>\n          <li><a href=\"/claim\">Faucet</a></li>\n          <li><a href=\"/hilo/\">Hi-Lo Game</a></li>\n          <li><a href=\"/crash/\">Crash</a></li>\n        </ul>\n      </div>\n      <div class=\"footer-section\">\n        <h3>Coming Soon</h3>\n        <ul>\n          <li><a href=\"/tools/devconx/\">DevConX (VSCode)</a></li>\n          <li><a href=\"/tools/scrypgen/\">ScrypGen</a></li>\n          <li><a href=\"/tools/nyx-unified/\">Nyx Unified</a></li>\n          <li><a href=\"/services/\">Services</a></li>\n          <li><a href=\"/aed/\">AED</a></li>\n        </ul>\n      </div>\n      <div class=\"footer-section\">\n        <h3>Legal</h3>\n        <ul>\n          <li><a href=\"/legal/privacy-policy.html\">Privacy Policy</a></li>\n          <li><a href=\"/legal/cookie-policy.html\">Cookie Policy</a></li>\n          <li><a href=\"/legal/terms.html\">Terms of Service</a></li>\n          <li><a href=\"/legal/disclaimer.html\">Disclaimer</a></li>\n          <li><a href=\"/legal/refund-policy.html\">Refund Policy</a></li>\n        </ul>\n      </div>\n    </div>\n    <div class=\"footer-bottom\">\n      <p>© 2026 Alsania I/O. All rights reserved. Built with purpose.</p>\n    </div>\n  </div>\n</footer>"
 };
 
-function loadComponent(containerId, componentName) {
-  return new Promise((resolve, reject) => {
-    const container = document.getElementById(containerId);
-    if (!container) { error(`Container #${containerId} not found!`); reject(new Error(`Container not found`)); return; }
-    log(`Loading ${containerId}: ${componentName}`);
-    const url = getComponentsBasePath() + "/" + componentName;
-    fetch(url).then(r => r.ok ? r.text() : Promise.reject(r.status)).then(html => {
-      container.innerHTML = html;
-      log(`✓ ${containerId} loaded from ${url}`);
-      resolve(container);
-    }).catch(() => {
-      if (INLINE_COMPONENTS[componentName]) {
-        container.innerHTML = INLINE_COMPONENTS[componentName];
-        log(`✓ ${containerId} loaded from inline fallback`);
-        resolve(container);
-      } else {
-        reject(new Error("No fallback"));
-      }
-    });
-  });
-}
+  function qs(sel) { return document.querySelector(sel); }
 
-function initMobileMenu() {
-  // Wait for DOM to be ready
-  setTimeout(function() {
-    const btn = document.querySelector(".mobile-menu");
-    const nav = document.querySelector(".alsania-nav");
-    
-    if (!btn || !nav) {
-      log("Mobile menu button or nav not found");
+  function fetchComponent(name) {
+    return fetch("/components/" + name + ".html", { cache: "no-cache" })
+      .then(function (r) { return r.ok ? r.text() : Promise.reject(r.status); });
+  }
+
+  function loadComponent(containerId, name) {
+    var el = document.getElementById(containerId);
+    if (!el) return Promise.resolve(null);
+    return fetchComponent(name)
+      .catch(function () { return INLINE_COMPONENTS[name] || ""; })
+      .then(function (html) { el.innerHTML = html; return el; });
+  }
+  window.loadComponent = loadComponent;
+
+  /* ---------- theme ---------- */
+  function currentTheme() {
+    return document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+  }
+  function applyTheme(t) { document.documentElement.setAttribute("data-theme", t); }
+  try { var saved = localStorage.getItem(THEME_KEY); if (saved === "light" || saved === "dark") applyTheme(saved); } catch (e) {}
+
+  function initThemeToggle() {
+    var holder = document.getElementById("theme-toggle-container");
+    if (!holder || holder.firstElementChild) return Promise.resolve();
+    return fetchComponent("theme-toggle").then(function (html) {
+      holder.innerHTML = html;
+      var cb = document.getElementById("theme-toggle");
+      if (!cb) return;
+      cb.checked = currentTheme() === "light";
+      cb.addEventListener("change", function () {
+        var t = cb.checked ? "light" : "dark";
+        applyTheme(t);
+        try { localStorage.setItem(THEME_KEY, t); } catch (e) {}
+      });
+    }).catch(function () { /* toggle is optional */ });
+  }
+
+  /* ---------- navigation (event delegation: bound once, works whenever the header appears) ---------- */
+  function nav() { return qs(".alsania-nav"); }
+  function burger() { return qs(".mobile-menu"); }
+
+  function closeDropdowns(except) {
+    var open = document.querySelectorAll(".alsania-nav .dropdown-menu.open");
+    for (var i = 0; i < open.length; i++) {
+      if (open[i] === except) continue;
+      open[i].classList.remove("open");
+      var t = open[i].parentElement && open[i].parentElement.querySelector(".dropdown-toggle");
+      if (t) t.setAttribute("aria-expanded", "false");
+    }
+  }
+
+  function setMenu(isOpen) {
+    var n = nav(), b = burger();
+    if (n) n.classList.toggle("active", isOpen);
+    if (b) { b.classList.toggle("active", isOpen); b.setAttribute("aria-expanded", isOpen ? "true" : "false"); }
+    if (!isOpen) closeDropdowns();
+  }
+
+  document.addEventListener("click", function (e) {
+    var t = e.target;
+    if (!t || !t.closest) return;
+
+    var b = t.closest(".mobile-menu");
+    if (b) {
+      e.preventDefault();
+      var n = nav();
+      setMenu(!(n && n.classList.contains("active")));
       return;
     }
-    
-    log("Initializing mobile menu...");
-    
-    // Toggle mobile menu on hamburger click
-    btn.addEventListener("click", function(e) {
-      e.stopPropagation();
-      nav.classList.toggle("active");
-      btn.classList.toggle("active");
-      log("Mobile menu toggled");
-    });
-    
-    // Close menu when clicking outside
-    document.addEventListener("click", function(e) {
-      if (!nav.contains(e.target) && !btn.contains(e.target)) {
-        nav.classList.remove("active");
-        btn.classList.remove("active");
-      }
-    });
-    
-    // Handle dropdown toggles on mobile
-    const dropdownToggles = document.querySelectorAll(".dropdown-toggle");
-    dropdownToggles.forEach(toggle => {
-      toggle.addEventListener("click", function(e) {
-        // On mobile, toggle the dropdown menu instead of navigating
-        if (window.innerWidth <= 768) {
-          e.preventDefault();
-          const parentLi = this.closest(".dropdown");
-          if (parentLi) {
-            const menu = parentLi.querySelector(".dropdown-menu");
-            if (menu) {
-              menu.classList.toggle("open");
-              log("Dropdown toggled");
-            }
-          }
-        }
-      });
-    });
-    
-    // Close dropdowns when a link is clicked
-    const navLinks = document.querySelectorAll(".nav-link:not(.dropdown-toggle)");
-    navLinks.forEach(link => {
-      link.addEventListener("click", function() {
-        // Close all dropdowns
-        document.querySelectorAll(".dropdown-menu").forEach(menu => {
-          menu.classList.remove("open");
-        });
-        // Close mobile menu
-        nav.classList.remove("active");
-        btn.classList.remove("active");
-      });
-    });
-    
-    log("Mobile menu initialized successfully");
-  }, 200);
-}
 
-function initComponents() {
-  log("Initializing components...");
-  const promises = [];
-  const hc = document.getElementById("header-container");
-  const fc = document.getElementById("footer-container");
-  if (hc) promises.push(loadComponent("header-container", "header"));
-  if (fc) promises.push(loadComponent("footer-container", "footer"));
-  if (promises.length === 0) { 
-    log("No containers found - skipping component loading");
-    // Still initialize mobile menu
-    initMobileMenu();
-    return; 
+    var toggle = t.closest(".alsania-nav .dropdown-toggle");
+    if (toggle) {
+      e.preventDefault(); // href="#" must never jump the page to the top
+      var li = toggle.closest(".dropdown");
+      var menu = li && li.querySelector(".dropdown-menu");
+      if (!menu) return;
+      var willOpen = !menu.classList.contains("open");
+      closeDropdowns(menu);
+      menu.classList.toggle("open", willOpen);
+      toggle.setAttribute("aria-expanded", willOpen ? "true" : "false");
+      return;
+    }
+
+    if (t.closest(".alsania-nav a[href]")) { setMenu(false); return; }
+    if (!t.closest(".alsania-nav")) setMenu(false);
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") setMenu(false);
+  });
+
+  window.addEventListener("resize", function () {
+    if (window.innerWidth > MOBILE_MAX) setMenu(false);
+  });
+
+  /* ---------- boot ---------- */
+  function init() {
+    loadComponent("header-container", "header")
+      .then(initThemeToggle)
+      .then(function () { return loadComponent("footer-container", "footer"); })
+      .catch(function (err) { console.error("[Components]", err); });
+    // Pages with a hard-coded header (index.html) still get the toggle.
+    if (!document.getElementById("header-container")) initThemeToggle();
   }
-  Promise.all(promises).then(() => {
-    log("All components loaded");
-    initMobileMenu();
-  }).catch(err => error("Some components failed:", err));
-}
 
-// Run on DOM ready
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initComponents);
-} else {
-  // DOM already ready, run now
-  initComponents();
-}
-
-// Also run after a delay to catch any late-rendered content
-setTimeout(function() {
-  const btn = document.querySelector(".mobile-menu");
-  if (btn && !btn._listenerAdded) {
-    log("Late mobile menu initialization");
-    initMobileMenu();
-  }
-}, 500);
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
